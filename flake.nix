@@ -33,7 +33,7 @@
           in
           {
             packages = {
-              zed-editor = pkgs.callPackage ./packages/zed-editor { rustPlatform = rustPlatform; };
+              zed-editor = pkgs.callPackage ./packages/zed-editor { };
               zed-editor-fhs = self'.packages.zed-editor.passthru.fhs;
 
               zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview { rustPlatform = rustPlatform; };
