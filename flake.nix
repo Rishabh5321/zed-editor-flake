@@ -28,15 +28,15 @@
           , inputs'
           , ...
           }:
-          # let
-          #   rustPlatform = inputs'.patched-nixpkgs.legacyPackages.rustPlatform;
-          # in
+          let
+            rustPlatform = inputs'.patched-nixpkgs.legacyPackages.rustPlatform;
+          in
           {
             packages = {
               zed-editor = pkgs.callPackage ./packages/zed-editor { };
               zed-editor-fhs = self'.packages.zed-editor.passthru.fhs;
 
-              zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview { };
+              zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview {rustPlatform = rustPlatform;};
               zed-editor-preview-fhs = self'.packages.zed-editor-preview.passthru.fhs;
 
               zed-editor-bin = pkgs.callPackage ./packages/zed-editor-bin { };
