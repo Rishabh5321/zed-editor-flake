@@ -41,8 +41,9 @@
 , writableTmpDirAsHomeHook
 , withGLES ? false
 , buildRemoteServer ? true
-, zed-editor
-,
+, zed-editor # This argument seems to be for the `fhs` function, not the main package derivation
+, crane # ADD THIS LINE
+, rustToolchain # ADD THIS LINE
 }:
 
 assert withGLES -> stdenv.hostPlatform.isLinux;
@@ -98,7 +99,7 @@ let
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zed-editor";
-  version = "0.190.3-pre";
+  version = "0.191.1-pre";
 
   outputs =
     [ "out" ]
@@ -110,7 +111,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "zed-industries";
     repo = "zed";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-ZJ7zLlPuM+AInVYFlYyH8PpDDUFgftL0SBWJY4Ws46Y=";
+    hash = "sha256-IKHZPvaXz/sxnvb1KTC7gCnOCQt3JcwSJ4325SkL3tI=";
   };
 
   patches = [
@@ -137,7 +138,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     '';
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-uNm7JLHvoC/e3vrMrm57iuepdmM9JpPVOGE/ev/vdyU=";
+  cargoHash = "sha256-6qS2qIo+5pZio+hbGX79PH5fHYAyCdKNAfn5GcrpIig=";
 
   nativeBuildInputs =
     [

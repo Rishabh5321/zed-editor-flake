@@ -5,12 +5,19 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     patched-nixpkgs.url = "github:TomaSajt/nixpkgs?ref=fetch-cargo-vendor-dup";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    crane.url = "github:ipetkov/crane";
   };
 
   outputs =
     inputs @ { flake-parts
     , nixpkgs
     , patched-nixpkgs
+    , rust-overlay
+    , crane
     , ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } (
@@ -28,15 +35,22 @@
           , inputs'
           , ...
           }:
-          # let
+          let
+            rustBin = inputs.rust-overlay.legacyPackages.${system}.rust-bin;
           #   rustPlatform = inputs'.patched-nixpkgs.legacyPackages.rustPlatform;
-          # in
+          in
           {
             packages = {
-              zed-editor = pkgs.callPackage ./packages/zed-editor { };
+              zed-editor = pkgs.callPackage ./packages/zed-editor { 
+                crane = crane.mkLib pkgs;
+                rustToolchain = rustBin.fromRustupToolchainFile ./rust-toolchain.toml;
+              };
               zed-editor-fhs = self'.packages.zed-editor.passthru.fhs;
 
-              zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview { };
+              zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview { 
+                crane = crane.mkLib pkgs;
+                rustToolchain = rustBin.fromRustupToolchainFile ./rust-toolchain.toml;
+               };
               zed-editor-preview-fhs = self'.packages.zed-editor-preview.passthru.fhs;
 
               zed-editor-bin = pkgs.callPackage ./packages/zed-editor-bin { };
