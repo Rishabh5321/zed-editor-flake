@@ -47,7 +47,13 @@
                 };
               };
               zed-editor-fhs = self'.packages.zed-editor.passthru.fhs;
-              zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview { };
+              zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview { 
+                # Use latest stable rust
+                rustPlatform = pkgs.makeRustPlatform {
+                  cargo = pkgs.rust-bin.stable.latest.default;
+                  rustc = pkgs.rust-bin.stable.latest.default;
+                };
+              };
               zed-editor-preview-fhs = self'.packages.zed-editor-preview.passthru.fhs;
               zed-editor-bin = pkgs.callPackage ./packages/zed-editor-bin { };
               zed-editor-bin-fhs = self'.packages.zed-editor-bin.passthru.fhs;
