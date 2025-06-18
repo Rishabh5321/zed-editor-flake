@@ -51,11 +51,11 @@
     },
     "patched-nixpkgs": {
       "locked": {
-        "lastModified": 1750263498,
-        "narHash": "sha256-vNAjjNKIAqkUJGAeUeY43497DU7JlVLfkUQuGXI/ryI=",
+        "lastModified": 1750265630,
+        "narHash": "sha256-EXmmM4nYyKlSUTdTnMkZ5wx3sQnp1CsUadlhPdV4lI8=",
         "owner": "TomaSajt",
         "repo": "nixpkgs",
-        "rev": "49e6f4fdaaedcbcea72a8a50a1bb34de3bca4317",
+        "rev": "2eb3c8e8ecbadb12aea28ed1834c2bfb96646e44",
         "type": "github"
       },
       "original": {
