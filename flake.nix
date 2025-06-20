@@ -4,16 +4,16 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     patched-nixpkgs.url = "github:TomaSajt/nixpkgs?ref=fetch-cargo-vendor-dup";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # rust-overlay = {
+    #   url = "github:oxalica/rust-overlay";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
   outputs =
     inputs @ { flake-parts
     , nixpkgs
     , patched-nixpkgs
-    , rust-overlay
+      #, rust-overlay
     , ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } (
@@ -30,29 +30,29 @@
           , inputs'
           , ...
           }:
-          let
-            # Apply rust overlay to get latest rust
-            pkgs = import nixpkgs {
-              inherit system;
-              overlays = [ rust-overlay.overlays.default ];
-            };
-          in
+          # let
+          #   # Apply rust overlay to get latest rust
+          #   pkgs = import nixpkgs {
+          #     inherit system;
+          #     overlays = [ rust-overlay.overlays.default ];
+          #   };
+          # in
           {
             packages = {
-              zed-editor = pkgs.callPackage ./packages/zed-editor { 
+              zed-editor = pkgs.callPackage ./packages/zed-editor {
                 # Use latest stable rust
-                rustPlatform = pkgs.makeRustPlatform {
-                  cargo = pkgs.rust-bin.stable.latest.default;
-                  rustc = pkgs.rust-bin.stable.latest.default;
-                };
+                # rustPlatform = pkgs.makeRustPlatform {
+                #   cargo = pkgs.rust-bin.stable.latest.default;
+                #   rustc = pkgs.rust-bin.stable.latest.default;
+                # };
               };
               zed-editor-fhs = self'.packages.zed-editor.passthru.fhs;
-              zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview { 
+              zed-editor-preview = pkgs.callPackage ./packages/zed-editor-preview {
                 # Use latest stable rust
-                rustPlatform = pkgs.makeRustPlatform {
-                  cargo = pkgs.rust-bin.stable.latest.default;
-                  rustc = pkgs.rust-bin.stable.latest.default;
-                };
+                # rustPlatform = pkgs.makeRustPlatform {
+                #   cargo = pkgs.rust-bin.stable.latest.default;
+                #   rustc = pkgs.rust-bin.stable.latest.default;
+                # };
               };
               zed-editor-preview-fhs = self'.packages.zed-editor-preview.passthru.fhs;
               zed-editor-bin = pkgs.callPackage ./packages/zed-editor-bin { };
