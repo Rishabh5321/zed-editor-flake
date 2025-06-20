@@ -39,4 +39,4 @@ jobs:
 
       - name: Build zed-editor-preview-fhs
         id: build-zed-editor-preview-fhs
-        run: nix build .#zed-editor-preview-fhs
+        run: nix build --no-substitute .#zed-editor-preview-fhs
