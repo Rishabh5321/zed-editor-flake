@@ -44,10 +44,7 @@
 , zed-editor
 ,
 }:
-
-assert withGLES -> stdenv.hostPlatform.isLinux;
-
-let
+assert withGLES -> stdenv.hostPlatform.isLinux; let
   executableName = "zeditor";
   # Based on vscode.fhs
   # Zed allows for users to download and use extensions
@@ -66,8 +63,7 @@ let
       name = executableName;
 
       # additional libraries which are commonly needed for extensions
-      targetPkgs =
-        pkgs:
+      targetPkgs = pkgs:
         (with pkgs; [
           # ld-linux-x86-64-linux.so.2 and others
           glibc
@@ -86,19 +82,24 @@ let
         inherit (zed-editor) pname version;
       };
 
-      meta = zed-editor.meta // {
-        description = ''
-          Wrapped variant of ${zed-editor.pname} which launches in a FHS compatible environment.
-          Should allow for easy usage of extensions without nix-specific modifications.
-        '';
-      };
+      meta =
+        zed-editor.meta
+        // {
+          description = ''
+            Wrapped variant of ${zed-editor.pname} which launches in a FHS compatible environment.
+            Should allow for easy usage of extensions without nix-specific modifications.
+          '';
+        };
     };
 
-  gpu-lib = if withGLES then libglvnd else vulkan-loader;
+  gpu-lib =
+    if withGLES
+    then libglvnd
+    else vulkan-loader;
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zed-editor";
-  version = "0.200.4";
+  version = "0.218.6";
 
   outputs =
     [ "out" ]
@@ -110,7 +111,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "zed-industries";
     repo = "zed";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-LSPTXOip62r8OIzJK0niY47IquJ3PuU+0X6zyBfKcfA=";
+    hash = "sha256-fNwJWC48DqUECadQ12p+iCHR7pIueFFdu6QRdomJ6/o=";
   };
 
   patches = [
@@ -120,24 +121,16 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ./0001-linux-linker.patch
   ];
 
-  cargoPatches = [
-    ./0002-fix-duplicate-reqwest.patch
-  ];
-
-  postPatch =
-    # Dynamically link WebRTC instead of static
+  patchPhase =
+    # Dynamically link WebRTC instead of static linking
     ''
-      substituteInPlace $cargoDepsCopy/webrtc-sys-*/build.rs \
-        --replace-fail "cargo:rustc-link-lib=static=webrtc" "cargo:rustc-link-lib=dylib=webrtc"
-
-      # Zed team renamed the function but forgot to update its usage in this file
-      # We rename it ourselves for now, until upstream fixes the issue
-      substituteInPlace $cargoDepsCopy/reqwest-0.12*/src/blocking/client.rs \
-        --replace-fail "inner.redirect(policy)" "inner.redirect_policy(policy)"
+      substituteInPlace \
+      	$cargoDepsCopy/*/webrtc-sys-*/build.rs \
+      	--replace-fail 'cargo:rustc-link-lib=static=webrtc' 'cargo:rustc-link-lib=dylib=webrtc'
     '';
 
-  useFetchCargoVendor = true;
-  cargoHash = "sha256-6rqmEwZ6uqt+xgw4ISan+Y/AHF+o0qp6BBWM57U7Qgw=";
+
+  cargoHash = "sha256-2w10y3YcWv0UsEBhnOMttQaP8OGco35k9+vukkJjFUQ=";
 
   nativeBuildInputs =
     [
@@ -183,10 +176,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
       (darwinMinVersionHook "12.3")
     ];
 
-  cargoBuildFlags = [
-    "--package=zed"
-    "--package=cli"
-  ] ++ lib.optionals buildRemoteServer [ "--package=remote_server" ];
+  cargoBuildFlags =
+    [
+      "--package=zed"
+      "--package=cli"
+    ]
+    ++ lib.optionals buildRemoteServer [ "--package=remote_server" ];
 
   # Required on darwin because we don't have access to the
   # proprietary Metal shader compiler.
@@ -218,7 +213,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
     patchelf --add-rpath ${gpu-lib}/lib $out/libexec/*
     patchelf --add-rpath ${wayland}/lib $out/libexec/*
-    wrapProgram $out/libexec/zed-editor --suffix PATH : ${lib.makeBinPath [ nodejs ]}
+    wrapProgram $out/libexec/zed-editor --suffix PATH : ${lib.makeBinPath [nodejs]}
   '';
 
   nativeCheckInputs = [
@@ -314,8 +309,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       ];
     };
     fhs = fhs { zed-editor = finalAttrs.finalPackage; };
-    fhsWithPackages =
-      f:
+    fhsWithPackages = f:
       fhs {
         zed-editor = finalAttrs.finalPackage;
         additionalPkgs = f;
